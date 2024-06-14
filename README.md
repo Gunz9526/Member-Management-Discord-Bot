@@ -1,1 +1,1 @@
-# UCMA-discord-bot
+# Member-Management-Discord-Bot

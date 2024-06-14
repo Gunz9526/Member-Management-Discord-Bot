@@ -6,7 +6,7 @@ import asyncio
 
 app = Flask(__name__)
 
-##################################################
+# #################################################
 # import discord
 # from discord.ext import commands
 
@@ -23,16 +23,16 @@ app = Flask(__name__)
 
 # @client.event
 # async def on_message(message):async def on_message(message):
-    # if message.author == client.user:
-    #     return
+#     if message.author == client.user:
+#         return
 
-    # if message.content.startswith('!테스트'):
-    #     await message.channel.send('Consider it done.')
+#     if message.content.startswith('!테스트'):
+#         await message.channel.send('Consider it done.')
 
-    # if message.content.startswith('!ㅎㅇ'):
-    #     DMchannel = client.create_dm(message.author)
-    #     await DMchannel.send("State your will.")
-####################################################
+#     if message.content.startswith('!ㅎㅇ'):
+#         DMchannel = client.create_dm(message.author)
+#         await DMchannel.send("State your will.")
+# ###################################################
 
 @app.route('/')
 def hello_world():
@@ -45,16 +45,16 @@ def test_field():
 
 # app.run(debug=True)
 
-async def test():
-    task1 = asyncio.create_task(client.start(''))
-    await task1
-    print("test함수")
+# async def test():
+#     task1 = asyncio.create_task(client.start(''))
+#     await task1
+#     print("test함수")
 
-print("되겠냐?")
+# print("되겠냐?")
 
-asyncio.run(test())
+# asyncio.run(test())
 # asyncio.run(await asyncio.create_task(test()))
-print("이거 되냐?")
+# print("이거 되냐?")
 # asyncio.run(client.start(''))
 
 # asyncio.run(client.start(''))
