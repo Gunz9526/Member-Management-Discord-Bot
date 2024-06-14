@@ -17,9 +17,13 @@ def initialize():
     discord_thread = threading.Thread(target=discord_bot_init)
     discord_thread.daemon = True
 
-
+    
     # flask_thread.start()
     discord_thread.start()
+
+    for thread in threading.enumerate():
+        print('***', thread.name)
+
     return app
 
     # flask_thread.join()

@@ -34,10 +34,14 @@ app = Flask(__name__)
 #         await DMchannel.send("State your will.")
 # ###################################################
 
+test = 0
+
 @app.route('/')
 def hello_world():
-    print("여기도 실행")
-    return 'Hello1 World!'
+    global test
+    test += 10
+    print("여기도 실행" + str(test))
+    return ('Hello1 World!' + str(test))
 
 @app.route('/test')
 def test_field():
