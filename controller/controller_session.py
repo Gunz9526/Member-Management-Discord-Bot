@@ -1,6 +1,8 @@
 from app import db
 from model.model_session import Session, SessionLog
 
+from start import shared_data
+
 class SessionController():
     def create_session(self):
         pass
@@ -19,4 +21,3 @@ class SessionController():
 
     def retrieve_session_log(self):
         pass
-    

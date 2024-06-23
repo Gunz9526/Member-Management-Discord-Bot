@@ -3,7 +3,6 @@ from flask_restx import Api
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import  SQLAlchemy
 
-from start import shared_data
 from config import db_url
 
 
@@ -17,6 +16,7 @@ db.init_app(app)
 
 from view.view_session import session_nameapace
 from view.view_member import member_nameapace
+
 
 authorizations = {'bearer_auth': {
     'type': 'apiKey',
