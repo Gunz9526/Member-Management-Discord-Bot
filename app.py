@@ -1,91 +1,44 @@
 from flask import Flask
-from bot import client
-import asyncio
+from flask_restx import Api
+from flask_jwt_extended import JWTManager
+from flask_sqlalchemy import  SQLAlchemy
 
+from start import shared_data
+from config import db_url
 
 
 app = Flask(__name__)
 
-# #################################################
-# import discord
-# from discord.ext import commands
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+db.init_app(app)
+
+from view.view_session import session_nameapace
+from view.view_member import member_nameapace
+
+authorizations = {'bearer_auth': {
+    'type': 'apiKey',
+    'in': 'header',
+    'name': 'Authorization'
+    }}
+
+api = Api(
+    app,
+    version='0.1',
+    title='OW2 Clan Management REST API',
+    description='Rest api 정리',
+    authorizations=authorizations,
+    security='bearer_auth',
+    doc="/api-docs")
 
 
-# intents = discord.Intents.default()
-# intents.message_content = True
-
-# client = discord.Client(intents=intents)
-
-# @client.event
-# async def on_ready():
-#     await client.change_presence(status=discord.Status.online, activity=discord.Game('ㅎㅇ'))
-#     print(f'봇 {client.user} 대기중')
-
-# @client.event
-# async def on_message(message):async def on_message(message):
-#     if message.author == client.user:
-#         return
-
-#     if message.content.startswith('!테스트'):
-#         await message.channel.send('Consider it done.')
-
-#     if message.content.startswith('!ㅎㅇ'):
-#         DMchannel = client.create_dm(message.author)
-#         await DMchannel.send("State your will.")
-# ###################################################
-
-test = 0
+api.add_namespace(session_nameapace, '/view_session')
+api.add_namespace(member_nameapace, '/view_member')
 
 @app.route('/')
-def hello_world():
-    global test
-    test += 10
-    print("여기도 실행" + str(test))
+def index():
+    test=0
+    print("변수 : " + str(test)) 
     return ('Hello1 World!' + str(test))
-
-@app.route('/test')
-def test_field():
-    return "여긴 테스트임"
-
-# app.run(debug=True)
-
-# async def test():
-#     task1 = asyncio.create_task(client.start(''))
-#     await task1
-#     print("test함수")
-
-# print("되겠냐?")
-
-# asyncio.run(test())
-# asyncio.run(await asyncio.create_task(test()))
-# print("이거 되냐?")
-# asyncio.run(client.start(''))
-
-# asyncio.run(client.start(''))
-# app.run을 하므로 또 비동기함수가 호출돼서 무한 반복
-# app.run이 없이 gunicorn 으로 실행 해도 되네? ㅋㅋ
-
-
-# def main():    
-#     asyncio.run(async_app())
-
-# main()
-
-# @app.route('/')
-# def hello_world():
-#     print("여기도 실행")
-#     return 'Hello World!'
-
-# async def async_app():
-#     task1 = asyncio.create_task(app.run(debug=True))
-#     task2 = asyncio.create_task(client.run(''))
-
-#     await task2
-#     await task1
-
-
-# asyncio.run(client.run(''))
-# print("여기까진 ㅇㅋ")
-
-# if __name__ == '__main__':
-#     app.run(debug=True)

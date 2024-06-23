@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 
+from start import ,
+
 
 intents = discord.Intents(messages=True, guilds=True)
 intents.message_content = True
@@ -67,7 +69,8 @@ async def on_message(message):
     
     if message.content.startswith("!변수"):
         from app import test
-        # global test
+        global test
+        test += 10
         await message.channel.send(test)
 
 def check_validate_nickname(phrases):
