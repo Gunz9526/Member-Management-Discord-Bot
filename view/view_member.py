@@ -83,6 +83,10 @@ class RetrieveBlackList(Resource):
                 if j == 'created_at':
                     result[i]['created_at'] = str(datetime.datetime.fromtimestamp(blacklist[i].created_at))
                     continue
+
+                if j == 'age':
+                    result[i]['age'] = str(datetime.datetime.now().year - int(blacklist[i].age) + 1)
+                    continue
                 # print(f'result[{i}]["{j}"] = blacklist[{i}].{j}')
                 exec(f'result[{i}]["{j}"] = blacklist[{i}].{j}')
             result[i]['clan_name'] = member_controller.retrieve_clan_info(blacklist[i].clan_id)
