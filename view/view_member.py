@@ -155,3 +155,11 @@ class AddBlackList(Resource):
         member_controller.add_blacklist(array=array)
         return {"result": "success", "value": array }
     
+@member_namespace.route('/edit_blacklist', methods=['PATCH'])
+class EditBlackList(Resource):
+    @member_namespace.expect(member_namespace.model("블랙리스트 수정", {"blacklist_id": fields.Integer(description="수정 할 블랙리스트 고유 id", example=1), "array":fields.Nested(blacklist_info_nested) }))
+    def patch(self):
+        blacklist_id = request.json['blacklist_id']
+        array = request.json['array']
+        member_controller.edit_blacklist(blacklist_id=blacklist_id, array=array)
+        return {"result": "success", "value":array}

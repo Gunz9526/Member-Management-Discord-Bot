@@ -68,8 +68,22 @@ class MemeberController:
         db.session.add(result)
         db.session.commit()
 
-    def edit_blacklist(self):
-        pass
+    def edit_blacklist(self, blacklist_id, array):
+        result = db.session.execute(db.select(BlackList).filter_by(blacklist_id=blacklist_id)).scalar_one()
+        age = datetime.datetime.now().year - int(array['age']) + 1
+        ban_date = datetime.datetime.timestamp(datetime.datetime.strptime(array['ban_date'], "%Y-%m-%d"))
+        model_list = ["nickname", "age", "gender", "discord_name1", "discord_name2", "extra_information", "player_rank", "reason1", "reason2", "reason3", "description", "ban_date", "sub_account", "clan_id"]
+        for i in model_list:
+            if i == 'age':
+                exec(f'if array["{i}"]: result.{i} = {age}')
+                continue
+            if i == 'ban_date':
+                exec(f'if array["{i}"]: result.{i} = {ban_date}')
+                continue
+
+            exec(f'if array["{i}"]: result.{i} = array["{i}"]')
+            db.session.commit()
+        return True
 
     def delete_blacklist(self):
         pass
