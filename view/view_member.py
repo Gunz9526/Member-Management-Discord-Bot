@@ -89,7 +89,7 @@ class RetrieveBlackList(Resource):
                     continue
                 # print(f'result[{i}]["{j}"] = blacklist[{i}].{j}')
                 exec(f'result[{i}]["{j}"] = blacklist[{i}].{j}')
-            result[i]['clan_name'] = member_controller.retrieve_clan_info(blacklist[i].clan_id)
+            result[i]['clan_name'] = member_controller.retrieve_clan_name(blacklist[i].clan_id)
             # exec(f'result[i] = { i:blacklist.i for i in model_list }')
         return result
 

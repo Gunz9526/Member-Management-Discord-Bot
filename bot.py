@@ -67,11 +67,20 @@ async def on_message(message):
         else:
             await message.channel.send('올바르지 않은 형식입니다.', reference=message)
     
-    if message.content.startswith("!변수"):
-        from app import test
-        global test
-        test += 10
-        await message.channel.send(test)
+    if message.content.startswith("!클랜원추가"):
+        # app context 참조해야함
+        from controller.controller_member import MemeberController
+        input_string = message.content.split(" ", maxsplit=1)
+        nickname = message.author.display_name.split('/')
+        
+        member_object = MemeberController()
+        clan_id = member_object.retrive_clan_id(nickname[0])
+        member_object.add_clan_member(clan_id=clan_id, nickname=input_string[1])
+        
+        # from app import test
+        # global test
+        # test += 10
+        await message.channel.send(nickname[0] + '클랜에 ' + input_string[1] + '이 추가되었습니다.', reference=message)
 
 def check_validate_nickname(phrases):
     nickname = phrases.split('/')

@@ -10,8 +10,12 @@ class MemeberController:
         result = db.session.execute(db.select(Clan)).scalars().fetchall()
         return result
     
-    def retrieve_clan_info(self, clan_id):
+    def retrieve_clan_name(self, clan_id):
         result = db.session.execute(db.select(Clan.clanname).filter_by(clan_id=clan_id)).scalar_one()
+        return result
+    
+    def retrive_clan_id(self, clan_name):
+        result = db.session.execute(db.select(Clan.clan_id).filter_by(clanname=clan_name)).scalar_one()
         return result
 
     def retrieve_clan_member(self, clan_id):
