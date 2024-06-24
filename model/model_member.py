@@ -9,17 +9,17 @@ class Clan(db.Model):
     __tablename__ = 'Clan'
     clan_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     clanname: Mapped[str] = mapped_column(String(200), nullable=False)
-    updated_at: Mapped[int] = mapped_column(Integer, nullable=False)
+    updated_at: Mapped[int] = mapped_column(Integer, nullable=False, default=time.time())
 
-    users = relationship("ClanMember", back_populates="clan")
-    blacklists = relationship("BlackList", back_populates="clan")
+    users = relationship("ClanMember", cascade="all, delete-orphan")
+    blacklists = relationship("BlackList",  cascade="all, delete-orphan")
 
 class ClanMember(db.Model):
     __tablename__ = 'Clan_Member'
     member_id: Mapped[int] = mapped_column(primary_key=True)
     nickname: Mapped[str] = mapped_column(String(200))
     created_at: Mapped[int] = mapped_column(default=time.time())
-    clan_id: Mapped[int] = mapped_column(nullable=False)
+    clan_id: Mapped[int] = mapped_column(Integer, ForeignKey('Clan.clan_id'))
     visible: Mapped[int] = mapped_column(default=1)
 
     clan = relationship("Clan", back_populates="users")
@@ -38,7 +38,7 @@ class BlackList(db.Model):
     reason2: Mapped[str] = mapped_column(Text, nullable=True)
     reason3: Mapped[str] = mapped_column(Text, nullable=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)
-    ban_date: Mapped[str] = mapped_column(String(50))
+    ban_date: Mapped[int] = mapped_column(Integer)
     sub_account: Mapped[str] = mapped_column(String(200), nullable=True)
     clan_id: Mapped[int] = mapped_column(Integer, ForeignKey('Clan.clan_id'))
     created_at: Mapped[int] = mapped_column(Integer, default=time.time())

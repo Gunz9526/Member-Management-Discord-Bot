@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from start import shared_data
+# from start import shared_data
 
 
 intents = discord.Intents(messages=True, guilds=True)

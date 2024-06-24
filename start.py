@@ -9,7 +9,7 @@ from bot import client
 #     if __name__ == '__main__':
 #         app.run(debug=True)
 
-shared_data = {}
+# shared_data = {}
 
 def discord_bot_init():
     client.run(token)

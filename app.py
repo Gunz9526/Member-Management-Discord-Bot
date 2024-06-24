@@ -10,12 +10,12 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
 db.init_app(app)
 
 from view.view_session import session_nameapace
-from view.view_member import member_nameapace
+from view.view_member import member_namespace
 
 
 authorizations = {'bearer_auth': {
@@ -35,7 +35,7 @@ api = Api(
 
 
 api.add_namespace(session_nameapace, '/view_session')
-api.add_namespace(member_nameapace, '/view_member')
+api.add_namespace(member_namespace, '/view_member')
 
 @app.route('/')
 def index():
