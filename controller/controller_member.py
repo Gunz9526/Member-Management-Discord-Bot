@@ -85,5 +85,8 @@ class MemeberController:
             db.session.commit()
         return True
 
-    def delete_blacklist(self):
-        pass
+    def delete_blacklist(self, blacklist_id):
+        result = db.session.execute(db.select(BlackList).filter_by(blacklist_id=blacklist_id)).scalar_one()
+        db.session.delete(result)
+        db.session.commit()
+        return True

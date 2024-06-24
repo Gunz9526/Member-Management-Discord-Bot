@@ -167,3 +167,11 @@ class EditBlackList(Resource):
         array = request.json['array']
         member_controller.edit_blacklist(blacklist_id=blacklist_id, array=array)
         return {"result": "success", "value":array}
+    
+@member_namespace.route('/delete_blacklist', methods=['DELETE'])
+class DeleteBlackList(Resource):
+    @member_namespace.expect(member_namespace.model("블랙리스트 삭제", {"blacklist_id": fields.Integer(description="삭제 할 블랙리스트 고유 id", example=1)}))
+    def delete(self):
+        blacklist_id = request.json['blacklist_id']
+        member_controller.delete_blacklist(blacklist_id=blacklist_id)
+        return {"result": "success", "value": blacklist_id}
