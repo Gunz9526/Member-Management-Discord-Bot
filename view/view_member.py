@@ -60,7 +60,8 @@ class RetrieveClanMember(Resource):
         clan_id = request.json['clan_id']
         member_list = member_controller.retrieve_clan_member(clan_id=clan_id)
         for i in range(len(member_list)):
-            result[i] = {"member_id": member_list[i].member_id, "nickname": member_list[i].nickname, "created_at": member_list[i].created_at}
+            created_at = str(datetime.datetime.fromtimestamp(int(member_list[i].created_at)))
+            result[i] = {"member_id": member_list[i].member_id, "nickname": member_list[i].nickname, "created_at": created_at}
 
         return result
 
@@ -175,3 +176,10 @@ class DeleteBlackList(Resource):
         blacklist_id = request.json['blacklist_id']
         member_controller.delete_blacklist(blacklist_id=blacklist_id)
         return {"result": "success", "value": blacklist_id}
+    
+
+@member_namespace.route('/aaatest', methods=['POST'])
+class test(Resource):
+    @member_namespace.expect(member_namespace.model("블랙리스트 삭제", {"blacklist_id": fields.Integer(description="삭제 할 블랙리스트 고유 id", example=1)}))
+    def post(self):
+       return member_controller.retrive_clan_id("(주)황버섯")

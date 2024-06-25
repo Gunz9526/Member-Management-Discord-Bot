@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-
+from app import app
 # from start import shared_data
 
 
@@ -69,14 +69,24 @@ async def on_message(message):
     
     if message.content.startswith("!클랜원추가"):
         # app context 참조해야함
-        from controller.controller_member import MemeberController
+        
         input_string = message.content.split(" ", maxsplit=1)
         nickname = message.author.display_name.split('/')
         
-        member_object = MemeberController()
-        clan_id = member_object.retrive_clan_id(nickname[0])
-        member_object.add_clan_member(clan_id=clan_id, nickname=input_string[1])
         
+        # print(nickname[0])
+        with app.app_context():
+            from controller.controller_member import MemeberController
+            member_object = MemeberController()
+            print(str(nickname[0]))
+            clan_id = int()
+            exec(f"clan_id = member_object.retrieve_clan_id('{str(nickname[0])}')")
+            print(clan_id)
+            print(input_string[1])
+            member_object.add_clan_member(clan_id=clan_id, nickname=input_string[1])
+            # member_object.add_clan_member(clan_id=5, nickname="타코야끼먹고싶다#1231")
+            
+
         # from app import test
         # global test
         # test += 10
