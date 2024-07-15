@@ -3,7 +3,7 @@ from flask_restx import Resource, Namespace, fields
 
 import datetime
 
-from controller.controller_member import MemeberController
+from controller.controller_member import MemberController
 
 member_namespace = Namespace(
     name = "멤버",
@@ -38,7 +38,7 @@ blacklist_info = member_namespace.model(
     },
 )
 
-member_controller = MemeberController()
+member_controller = MemberController()
 
 
 @member_namespace.route('/all_clan', methods=['GET'])
@@ -58,7 +58,7 @@ class RetrieveClanMember(Resource):
     def post(self):
         result = {}
         clan_id = request.json['clan_id']
-        member_list = member_controller.retrieve_clan_member(clan_id=clan_id)
+        member_list = member_controller.listing_clan_member(clan_id=clan_id)
         for i in range(len(member_list)):
             created_at = str(datetime.datetime.fromtimestamp(int(member_list[i].created_at)))
             result[i] = {"member_id": member_list[i].member_id, "nickname": member_list[i].nickname, "created_at": created_at}
@@ -70,7 +70,7 @@ class RetrieveBlackList(Resource):
     def get(self):        
         model_list = ["blacklist_id", "nickname", "age", "gender", "discord_name1", "discord_name2", "extra_information", "player_rank", "reason1", "reason2", "reason3", "description", "ban_date", "sub_account", "clan_id", "created_at"]
         result = {}
-        blacklist = member_controller.retrieve_blacklist()
+        blacklist = member_controller.listing_blacklist()
         # for i in model_list:
         #     test = exec({eval(f'{i}:blacklist.{i}')})
         #     print(test)
@@ -182,4 +182,4 @@ class DeleteBlackList(Resource):
 class test(Resource):
     @member_namespace.expect(member_namespace.model("블랙리스트 삭제", {"blacklist_id": fields.Integer(description="삭제 할 블랙리스트 고유 id", example=1)}))
     def post(self):
-       return member_controller.retrive_clan_id("(주)황버섯")
+       return member_controller.retrieve_clan_id("(주)황버섯")

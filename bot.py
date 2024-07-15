@@ -1,5 +1,7 @@
 import discord
 from discord.ext import commands
+from util.check_nickname import check_validate_nickname
+
 from app import app
 # from start import shared_data
 
@@ -7,95 +9,75 @@ from app import app
 intents = discord.Intents(messages=True, guilds=True)
 intents.message_content = True
 
-client = discord.Client(intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents)
 
-@client.event
+@bot.event
 async def on_ready():
-    await client.change_presence(status=discord.Status.online, activity=discord.Game('테스트'))
-    print(f'ㅡㅡㅡㅡㅡ {client.user} 실행 ㅡㅡㅡㅡㅡ')
+    await bot.change_presence(status=discord.Status.online, activity=discord.Game('테스트'))
+    print(f'ㅡㅡㅡㅡㅡ {bot.user} 실행 ㅡㅡㅡㅡㅡ')
 
 
-# 함수 분리 예정
-@client.event
-async def on_message(message):
-    # 봇이 보낸 메세지는 읽어들이면 안됨.
-    if message.author == client.user:
-        return
-
-    # 멤버 CRUD 작업을 위한 개인용 링크를 DM으로 전송. 
-    if message.content.startswith('!링크'):
-        DMchannel = await client.create_dm(message.author)
-        nickname = message.author.display_name.split('/')
-        if len(nickname) > 2:
-            await DMchannel.send("반갑습니다. " + nickname[0] + " 클랜의 " + nickname[2] + " " + nickname[1] + "님")
-        else:
-            await DMchannel.send("반갑습니다. " + message.author.display_name + "님 닉네임을 형식에 맞게 변경해주세요")
-
-    # flask app 과 데이터 공유 에정, 아직 방법 구상 중
-    if message.content.startswith('!멤버추가'):
-        input_string = message.content.split(" ", maxsplit=1)
-        if len(input_string) > 1:
-            add_user = check_validate_nickname(input_string)
-            await message.channel.send('멤버 ' + add_user[0], reference=message)
-        else:
-            await message.channel.send('추가 할 멤버를 정확히 입력해주세요', reference=message)
-
-    # 도움말, 명령어 나열 예정
-    if message.content.startswith('!도움'):
-        embed = discord.Embed(title='명령어', description='명령어들의 모음입니다.')
-        embed.add_field(name='!링크', value='클랜원 및 블랙리스트 작업이 가능한 링크가 DM으로 전송됩니다.')
-        embed.add_field(name='!서버이름', value='현재는 서버이름만 출력. 추후 서버ID기반으로 작업가능')
-        embed.add_field(name='!멤버검색', value='해당 문자열이 포함된 디스코드 사용자 검색. 클랜 검색으로 이용할 예정')        
-        embed.add_field(name='!멤버추가', value='간단한 클랜원 추가는 이 명령어로 할 수 있도록 시도할 에정')
-        await message.channel.send(embed=embed, reference=message)
-
-    # 길드 ID 및 이름 return 가능
-    if message.content.startswith('!서버이름'):
-        await message.channel.send(message.channel.guild.name + ' ' + str(message.channel.guild.id), reference=message)
+# 함수 모듈화 예정
+@bot.command(name='링크')
+async def send_dm(ctx):
+    DMchannel = await ctx.author.create_dm()
+    nickname = check_validate_nickname(ctx.author.display_name)
+    if nickname is not None:
+        await DMchannel.send("반갑습니다. " + nickname['clan'] + " 클랜의 " + nickname['role'] + " " + nickname['nickname'] + "님")
     
-    # 클랜 검색, 클랜원 검색 예정
-    if message.content.startswith("!멤버검색"):
-        input_string = message.content.split(" ", maxsplit=1)
-        if len(input_string) > 1:
-            result = await message.channel.guild.query_members(input_string[1])
-            if result is not None:
-                for member in result:
-                    await message.channel.send(member.mention, reference=message)
-                # print(i for i in result)
-            else:
-                await message.channel.send('없음', reference=message)
-        else:
-            await message.channel.send('올바르지 않은 형식입니다.', reference=message)
-    
-    if message.content.startswith("!클랜원추가"):
-        # app context 참조해야함
-        
-        input_string = message.content.split(" ", maxsplit=1)
-        nickname = message.author.display_name.split('/')
-        
-        
-        # print(nickname[0])
-        with app.app_context():
-            from controller.controller_member import MemeberController
-            member_object = MemeberController()
-            print(str(nickname[0]))
-            clan_id = int()
-            exec(f"clan_id = member_object.retrieve_clan_id('{str(nickname[0])}')")
-            print(clan_id)
-            print(input_string[1])
-            member_object.add_clan_member(clan_id=clan_id, nickname=input_string[1])
-            # member_object.add_clan_member(clan_id=5, nickname="타코야끼먹고싶다#1231")
-            
+@bot.command(name='도움')
+async def request_help(ctx):
+    embed = discord.Embed(title='명령어', description='명령어들의 모음입니다.')
+    embed.add_field(name='!링크', value='클랜원 및 블랙리스트 작업이 가능한 링크가 DM으로 전송됩니다.')
+    embed.add_field(name='!서버이름', value='현재는 서버이름만 출력. 추후 서버ID기반으로 작업가능')
+    embed.add_field(name='!멤버검색', value='해당 문자열이 포함된 디스코드 사용자 검색. 클랜 검색으로 이용할 예정')        
+    embed.add_field(name='!멤버추가', value='간단한 클랜원 추가는 이 명령어로 할 수 있도록 시도할 에정')
+    await ctx.channel.send(embed=embed, reference=ctx.message)
 
-        # from app import test
-        # global test
-        # test += 10
-        await message.channel.send(nickname[0] + '클랜에 ' + input_string[1] + '이 추가되었습니다.', reference=message)
+@bot.command(name='서버이름')
+async def request_servername(ctx):
+    await ctx.channel.send(ctx.guild.name + ' ' + str(ctx.guild.id), reference=ctx.message)
+        
+@bot.command(name='클랜원추가')
+async def add_clan_member(ctx, *args):
+    with app.app_context():
+        from controller.controller_member import MemberController
+        member_object = MemberController()
+        clan_name = check_validate_nickname(ctx.author.display_name)
 
-def check_validate_nickname(phrases):
-    nickname = phrases.split('/')
-    if nickname > 2:
-        return {"clan": nickname[0], "role": nickname[1], "nickname": nickname[2]}
+        clan_id = member_object.retrieve_clan_id(clan_name['clan_name'])
+        for i in range(len(args)):
+            member_object.add_clan_member(clan_id=clan_id, nickname=args[i])
 
-    return None
-    
+    await ctx.channel.send(clan_name['clan_name'] + '클랜에 ' + ', '.join(args) + '이 추가되었습니다.', reference=ctx.message)
+
+@bot.command('클랜원검색')
+async def retrieve_member(ctx, args):
+    with app.app_context():
+        from controller.controller_member import MemberController
+        member_object = MemberController()
+        clan_name = check_validate_nickname(ctx.author.display_name)
+        clan_id = member_object.retrieve_clan_id(clan_name['clan_name'])
+        member_list = member_object.retrieve_clan_member(nickname=args, clan_id=clan_id)
+        
+        print(type(member_list))
+        embed = discord.Embed(title='클랜원 목록', description=f'{clan_name["clan_name"]}클랜의 검색된 클랜 멤버 입니다.')        
+        embed.add_field(name=f'멤버 ( {len(member_list)}명 )', value='\n'.join(member_list), inline=False)
+        await ctx.channel.send(embed=embed, reference=ctx.message)
+
+@bot.command('블랙리스트검색')
+async def retrieve_blacklist(ctx, args):
+    with app.app_context():
+        from controller.controller_member import MemberController
+        member_object = MemberController()
+        member_list = member_object.retrieve_blacklist(nickname=args)
+        print(type(member_list))
+        embed = discord.Embed(title='블랙리스트')
+        embed.add_field(name=f'멤버 ( {len(member_list)}명 )', value='\n'.join(member_list), inline=False)
+        await ctx.channel.send(embed=embed, reference=ctx.message)
+
+
+@bot.command(name='나는고수냐')
+async def gosu(ctx):
+    nickname = check_validate_nickname(ctx.author.display_name)
+    await ctx.channel.send(f"말씀중에 죄송합니다. {nickname['nickname']} 저얼대 월드클래스 아닙니다.")

@@ -3,7 +3,7 @@ import threading
 from config import token
 
 from app import app
-from bot import client
+from bot import bot
 
 # def flask_app_init():
 #     if __name__ == '__main__':
@@ -12,7 +12,7 @@ from bot import client
 # shared_data = {}
 
 def discord_bot_init():
-    client.run(token)
+    bot.run(token)
 
 def initialize():
     discord_thread = threading.Thread(target=discord_bot_init)

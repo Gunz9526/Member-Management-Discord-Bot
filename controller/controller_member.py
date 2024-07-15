@@ -1,8 +1,9 @@
 import datetime
+import binascii
 from app import db, app
 from model.model_member import Clan, ClanMember, BlackList
 
-class MemeberController:
+class MemberController:
 
     # 세션 검사 프로세스 추후 추가
 
@@ -17,13 +18,21 @@ class MemeberController:
     def retrieve_clan_id(self, clan_name):
         result = db.session.execute(db.select(Clan.clan_id).filter_by(clanname=clan_name)).scalar()
         return result
-
-    def retrieve_clan_member(self, clan_id):
-        result = db.session.execute(db.select(ClanMember).filter_by(clan_id=clan_id)).scalars().fetchall()
+    
+    def retrieve_clan_member(self, nickname, clan_id):
+        result = db.session.execute(db.select(ClanMember.nickname).filter(ClanMember.nickname.like(f"%{nickname}%"), ClanMember.clan_id == clan_id, ClanMember.visible == 1)).scalars().fetchall()
+        return result
+    
+    def retrieve_blacklist(self, nickname):
+        result = db.session.execute(db.select(BlackList.nickname).filter(BlackList.nickname.like(f"%{nickname}%"), BlackList.visible == 1)).scalars().fetchall()
         return result
 
-    def retrieve_blacklist(self):
-        result = db.session.execute(db.select(BlackList)).scalars().fetchall()
+    def listing_clan_member(self, clan_id):
+        result = db.session.execute(db.select(ClanMember).filter_by(clan_id=clan_id, visible=1)).scalars().fetchall()
+        return result
+
+    def listing_blacklist(self):
+        result = db.session.execute(db.select(BlackList).filter_by(visible=1)).scalars().fetchall()
         return result
     
     def add_clan(self, clan_name):        
@@ -56,7 +65,7 @@ class MemeberController:
 
     def delete_clan_member(self, member_id):
         result = db.session.execute(db.select(ClanMember).filter_by(member_id=member_id)).scalar_one()
-        db.session.delete(result)
+        result.visible = 0
         db.session.commit()
         return True
 
@@ -90,6 +99,6 @@ class MemeberController:
 
     def delete_blacklist(self, blacklist_id):
         result = db.session.execute(db.select(BlackList).filter_by(blacklist_id=blacklist_id)).scalar_one()
-        db.session.delete(result)
+        result.visible = 0
         db.session.commit()
         return True
