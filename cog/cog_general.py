@@ -20,11 +20,9 @@ class CogGeneral(commands.Cog):
     async def request_servername(self, ctx):
         await ctx.channel.send(ctx.guild.name + ' ' + str(ctx.guild.id), reference=ctx.message)
 
-    @commands.command(name='나는고수냐')
-    async def gosu(self, ctx):
-        from util.check_nickname import check_validate_nickname
-        nickname = check_validate_nickname(ctx.author.display_name)
-        await ctx.channel.send(f"말씀중에 죄송합니다. {nickname['nickname']} 저얼대 월드클래스 아닙니다.")
+    @commands.command(name='내정보')
+    async def request_info(self, ctx):
+        await ctx.channel.send(f"닉네임 : {ctx.author.display_name} \n유저 아이디: {ctx.author.name}\n유저 고유 아이디: {ctx.author.id}")
 
 async def setup(bot):
     await bot.add_cog(CogGeneral(bot))

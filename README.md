@@ -9,12 +9,13 @@
 ## 개발환경
 - **Version** : Python 3.11.9
 - **IDE** : VSCode
-- **Framework** : Flask
+- **Framework** : Flask,
+- **Package** : Discord.py, Discord.Extension, flask-restx, Flask-SQLAlchemy, Flask-JWT-Extended, pymysql
 - **ORM** : SQLAlchemy
 
 ## 기술 스택
-- **Server** : AWS EC2
-- **DataBase** : AWS RDS, Mysql, Pymysql
+- **Server** : AWS EC2, Gunicorn
+- **DataBase** : AWS RDS, Mysql
 - 
 
 ## 프로젝트 아키텍쳐

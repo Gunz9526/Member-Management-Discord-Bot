@@ -1,6 +1,5 @@
 import datetime
-import binascii
-from app import db, app
+from app import db
 from model.model_member import Clan, ClanMember, BlackList
 
 class MemberController:
