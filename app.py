@@ -7,9 +7,11 @@ from config import db_url
 
 
 app = Flask(__name__)
-
+app.config["JWT_SECRET_KEY"] = "super-secret"
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+jwt = JWTManager(app)
+
 db = SQLAlchemy()
 
 db.init_app(app)
@@ -36,9 +38,3 @@ api = Api(
 
 api.add_namespace(session_nameapace, '/view_session')
 api.add_namespace(member_namespace, '/view_member')
-
-@app.route('/')
-def index():
-    test=0
-    print("변수 : " + str(test)) 
-    return ('Hello1 World!' + str(test))

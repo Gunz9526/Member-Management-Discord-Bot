@@ -5,14 +5,7 @@ from util.check_nickname import check_validate_nickname
 class CogMember(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.command(name='링크')
-    async def send_dm(self, ctx):
-        DMchannel = await ctx.author.create_dm()
-        nickname = check_validate_nickname(ctx.author.display_name)
-        if nickname is not None:
-            await DMchannel.send("반갑습니다. " + nickname['clan'] + " 클랜의 " + nickname['role'] + " " + nickname['nickname'] + "님")
-
+        
     @commands.command(name='클랜원추가')
     async def add_clan_member(self, ctx, *args):
         from app import app

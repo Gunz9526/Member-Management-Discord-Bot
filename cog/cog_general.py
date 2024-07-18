@@ -20,9 +20,6 @@ class CogGeneral(commands.Cog):
     async def request_servername(self, ctx):
         await ctx.channel.send(ctx.guild.name + ' ' + str(ctx.guild.id), reference=ctx.message)
 
-    @commands.command(name='내정보')
-    async def request_info(self, ctx):
-        await ctx.channel.send(f"닉네임 : {ctx.author.display_name} \n유저 아이디: {ctx.author.name}\n유저 고유 아이디: {ctx.author.id}")
 
 async def setup(bot):
     await bot.add_cog(CogGeneral(bot))

@@ -48,7 +48,8 @@ async def load_extension(ctx, *args):
 async def load_extensions(bot):
     extensions = [
         'cog.cog_general',
-        'cog.cog_member'
+        'cog.cog_member',
+        'cog.cog_auth'
     ]
 
     for extension in extensions:
