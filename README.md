@@ -19,7 +19,7 @@
 - 
 
 ## 프로젝트 아키텍쳐
-
+![프로젝트 아키텍쳐](https://github.com/Gunz9526/Member-Management-Discord-Bot/blob/main/img/ERD.JPG)
 
 ## 주요 기능
 - 
