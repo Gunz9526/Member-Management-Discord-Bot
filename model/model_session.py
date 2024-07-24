@@ -10,7 +10,7 @@ class Session(db.Model):
     session_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     session_name: Mapped[str] = mapped_column(String(200), nullable=False)
     discord_nickname: Mapped[str] = mapped_column(String(200), nullable=False)
-    created_at: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[int] = mapped_column(Integer, nullable=False, default=time.time())
     tokens: Mapped[str] = mapped_column(Text, nullable=False)
     discord_id: Mapped[str] = mapped_column(Text, nullable=False)
     discord_unique_id: Mapped[str] = mapped_column(Text, nullable=False)
@@ -27,7 +27,7 @@ class SessionLog(db.Model):
     action_type: Mapped[str] = mapped_column(String(200), nullable=False)
     action_data: Mapped[str] = mapped_column(Text, nullable=True)
     session_id: Mapped[int] = mapped_column(Integer, ForeignKey('Session.session_id'), nullable=False)
-    created_at: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[int] = mapped_column(Integer, nullable=False, default=time.time())
     
     # Relationships
     session = relationship("Session", back_populates="session_log")

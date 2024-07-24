@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from flask import Flask
 from flask_restx import Api
 from flask_jwt_extended import JWTManager
@@ -10,6 +12,9 @@ app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "super-secret"
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(hours=2)
+
 jwt = JWTManager(app)
 
 db = SQLAlchemy()
