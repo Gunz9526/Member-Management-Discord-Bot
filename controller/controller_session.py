@@ -26,18 +26,22 @@ class SessionController():
         db.session.commit()
         return {"session_name": session_name}
 
-    def check_session_validation(self, session_id, tokens):
-        result = db.session.execute(db.select(Session).filter(Session.session_id==session_id, Session.tokens==tokens, Session.expired==0).order_by(Session.created_at.desc())).scalar()
+    def check_expired_session(self, session_id, session_name, tokens):
+        result = db.session.execute(db.select(Session).filter(Session.session_id==session_id, Session.session_name==session_name, Session.tokens==tokens, Session.expired==0).order_by(Session.created_at.desc())).scalar()
         return result
-        
 
-    def destory_session(self, session_id):
-        result = db.session.execute(db.select(Session).filter(Session.session_id==session_id).order_by(Session.created_at.desc())).scalar()
+    def check_falsified_session(self, session_id, session_name, tokens):
+        result = db.session.execute(db.select(Session).filter(Session.session_id==session_id, Session.session_name==session_name, Session.tokens==tokens).order_by(Session.created_at.desc())).scalar()
+        if result is None:
+            return None
+        return result
+    
+    def destory_session(self, session_name):
+        result = db.session.execute(db.select(Session).filter(Session.session_name==session_name).order_by(Session.created_at.desc())).scalar()
         result.expired = 1
         # db.session.delete(result)
         db.session.commit()
-        return True
-        
+        return True        
 
     def verify_permission(self):
         pass

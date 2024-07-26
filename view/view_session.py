@@ -27,13 +27,15 @@ class CreateToken(Resource):
 class CreateSession(Resource):
     @session_nameapace.expect(session_nameapace.model("세션 생성", {'discord_nickname': fields.String(description='디스코드 서버 닉네임'),'discord_id': fields.String(description='디스코드 아이디'), 'discord_unique_id': fields.String(description='디스코드 고유 아이디')}))
     def post(self):
-        discord_id = request.json['discord_id']
-        discord_nickname = request.json['discord_nickname']
-        discord_unique_id = request.json['discord_unique_id']
+        session_name = request.json['session_name']
         session_object = SessionController()
-        tokens = session_object.create_token(discord_id=discord_id, discord_nickname=discord_nickname, discord_unique_id=discord_unique_id)
-        session = session_object.create_session(discord_id=discord_id, discord_nickname=discord_nickname, discord_unique_id=discord_unique_id, access_token=tokens['access_token'])
-        return {"result": "success", "session_name": session['session_name']}
+        tokens = session_object.get_token(session_name=session_name)
+        expired_check = session_object.check_expired_session(session_id=tokens.session_id, session_name=tokens.session_name, tokens=tokens.tokens)
+        if expired_check is None:
+            return {"result": "Unauthorized"}
+        session_object.destory_session(session_name==tokens.session_name)
+        return {"token": tokens.tokens, "session_name": tokens.session_name, "validation": "valid"}
+
     
 
 @session_nameapace.route('/listing_session', methods=['GET'])
@@ -56,12 +58,13 @@ class DestroySession(Resource):
         session_object.destory_session(session_id)
         return {"result": "success"}
 
-@session_nameapace.route('/<string:session_name>', methods=['GET'])
-class CreateEntrance(Resource):
-    def get(self, session_name):
-        session_object = SessionController()
-        tokens = session_object.get_token(session_name=session_name)
-        validation_check = session_object.check_session_validation(session_id=tokens.session_id, tokens=tokens.tokens)
-        if validation_check is None:
-            return {"result": "Unauthorized"}
-        return {"token": tokens.tokens, "session_id": tokens.session_id, "validation": "validate"}
+
+# @session_nameapace.route('/<string:session_name>', methods=['GET'])
+# class CreateEntrance(Resource):
+#     def get(self, session_name):
+#         session_object = SessionController()
+#         tokens = session_object.get_token(session_name=session_name)
+#         validation_check = session_object.check_session_validation(session_id=tokens.session_id, tokens=tokens.tokens)
+#         if validation_check is None:
+#             return {"result": "Unauthorized"}
+#         return {"token": tokens.tokens, "session_id": tokens.session_id, "validation": "validate"}
