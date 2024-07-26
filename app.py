@@ -41,5 +41,5 @@ api = Api(
     doc="/api-docs")
 
 
-api.add_namespace(session_nameapace, '/view_session')
-api.add_namespace(member_namespace, '/view_member')
+api.add_namespace(session_nameapace, '/session')
+api.add_namespace(member_namespace, '/member')

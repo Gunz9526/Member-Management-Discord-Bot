@@ -30,7 +30,7 @@ class CogMember(commands.Cog):
             clan_id = member_object.retrieve_clan_id(clan_name['clan'])
             member_list = member_object.retrieve_clan_member(nickname=args, clan_id=clan_id)
 
-            embed = discord.Embed(title='클랜원 목록', description=f'{clan_name["clan"]}클랜의 검색된 클랜 멤버 입니다.')        
+            embed = discord.Embed(title='클랜원 목록', description=f'{clan_name["clan"]}클랜의 검색된 클랜 멤버 입니다.')
             embed.add_field(name=f'멤버 ( {len(member_list)}명 )', value='\n'.join(member_list), inline=False)
             await ctx.channel.send(embed=embed, reference=ctx.message)
 

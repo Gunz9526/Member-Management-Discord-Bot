@@ -8,8 +8,12 @@ class SessionController():
     def create_token(self, discord_nickname: str, discord_id: str, discord_unique_id: str):
         additional_claims = {"discord_id": discord_id, "discord_unique_id": discord_unique_id}
         access_token = create_access_token(identity=discord_nickname, additional_claims=additional_claims)
-        decoded_token = decode_token(access_token)
+        # decoded_token = decode_token(access_token)
         return {"access_token": access_token}
+    
+    def get_token(self, session_name):
+        result = db.session.execute(db.select(Session).filter(Session.session_name==session_name).order_by(Session.created_at.desc())).scalar()
+        return result
 
     def verify_token(self, discord_nickname: str, discord_id: str, discord_unique_id: str):
         pass
@@ -20,15 +24,17 @@ class SessionController():
         result = Session(session_name=session_name, discord_nickname=discord_nickname, discord_id=discord_id, discord_unique_id=discord_unique_id, tokens=access_token)
         db.session.add(result)
         db.session.commit()
-        return True
+        return {"session_name": session_name}
 
-    def check_session_validation(self):
-        pass
+    def check_session_validation(self, session_id, tokens):
+        result = db.session.execute(db.select(Session).filter(Session.session_id==session_id, Session.tokens==tokens, Session.expired==0).order_by(Session.created_at.desc())).scalar()
+        return result
+        
 
     def destory_session(self, session_id):
         result = db.session.execute(db.select(Session).filter(Session.session_id==session_id).order_by(Session.created_at.desc())).scalar()
-        # result.expired = 1
-        db.session.delete(result)
+        result.expired = 1
+        # db.session.delete(result)
         db.session.commit()
         return True
         
