@@ -4,6 +4,7 @@ from flask import Flask
 from flask_restx import Api
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import  SQLAlchemy
+from flask_cors import CORS
 
 from config import db_url
 
@@ -18,10 +19,10 @@ app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(hours=2)
 jwt = JWTManager(app)
 
 db = SQLAlchemy()
-
+CORS(app)
 db.init_app(app)
 
-from view.view_session import session_nameapace
+from view.view_session import session_namespace
 from view.view_member import member_namespace
 
 
@@ -41,5 +42,5 @@ api = Api(
     doc="/api-docs")
 
 
-api.add_namespace(session_nameapace, '/session')
+api.add_namespace(session_namespace, '/session')
 api.add_namespace(member_namespace, '/member')

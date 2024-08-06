@@ -1,9 +1,11 @@
 from flask import jsonify, request
 from flask_restx import Resource, Namespace, fields
+from flask_jwt_extended import get_jwt, jwt_required
 
 import datetime
 
 from controller.controller_member import MemberController
+from controller.controller_session import SessionController
 
 member_namespace = Namespace(
     name = "멤버",
@@ -39,21 +41,41 @@ blacklist_info = member_namespace.model(
 )
 
 member_controller = MemberController()
+session_controller = SessionController()
 
 
-@member_namespace.route('/all_clan', methods=['GET'])
+@member_namespace.route('/all_clan', methods=['POST'])
 class RetrieveAllClan(Resource):
-    def get(self):
+    @jwt_required()
+    @member_namespace.expect(member_namespace.model("세션조회", {"session_name": fields.String(description="세션 name", example='dfsfdsfsdf')}))
+    def post(self):
         result = {}
+        session_id = request.json['session_id']
+        session_name = request.json['session_name']
+        
+
+        # 요청 헤더에서 JWT 토큰 텍스트 추출
+        auth_header = request.headers.get('Authorization', None)
+        if auth_header and auth_header.startswith('Bearer '):
+            tokens = auth_header.split(' ')[1]
+        else:
+            tokens = None
+
+        valid_check = session_controller.cross_check_session_token(session_id=session_id, session_name=session_name, tokens=tokens)
+        if valid_check is None:
+            return {"result": "Unauthorized"}
         clan_list = member_controller.retrieve_all_clan()
         for i in range(len(clan_list)):
             updated_time = str(datetime.datetime.fromtimestamp(int(clan_list[i].updated_at)))
             result[i] = {"clan_id": clan_list[i].clan_id, "clan_name": clan_list[i].clanname, "clan_created_at": updated_time}
         
+        # result = get_jwt()
         return result
     
+
 @member_namespace.route('/all_clanmember', methods=['POST'])
 class RetrieveClanMember(Resource):
+    @jwt_required()
     @member_namespace.expect(member_namespace.model("클랜 별 인원 나열", {"clan_id": fields.Integer(description="조회 할 클랜 id", example=2)}))
     def post(self):
         result = {}
@@ -67,6 +89,7 @@ class RetrieveClanMember(Resource):
 
 @member_namespace.route('/all_blacklist', methods=['GET'])
 class RetrieveBlackList(Resource):
+    @jwt_required()
     def get(self):        
         model_list = ["blacklist_id", "nickname", "age", "gender", "discord_name1", "discord_name2", "extra_information", "player_rank", "reason1", "reason2", "reason3", "description", "ban_date", "sub_account", "clan_id", "created_at"]
         result = {}
@@ -96,14 +119,16 @@ class RetrieveBlackList(Resource):
 
 @member_namespace.route('/add_clan', methods=['POST'])
 class AddClan(Resource):
+    @jwt_required()
     @member_namespace.expect(member_namespace.model("클랜 추가", {'clan_name': fields.String(description="클랜 이름", example="테스트클랜1")}))
     def post(self):
         clan_name = request.json['clan_name']
         member_controller.add_clan(clan_name)
         return {"result": "success"}
-    
+
 @member_namespace.route('/edit_clan', methods=['PATCH'])
 class EditClan(Resource):
+    @jwt_required()
     @member_namespace.expect(member_namespace.model("클랜 이름 수정", {"clan_id": fields.Integer(description="클랜 id", example=2) ,"clan_name": fields.String(description="수정 할 클랜 이름", example="수정 클랜 이름")}))
     def patch(self):
         clan_id = request.json['clan_id']
@@ -113,9 +138,10 @@ class EditClan(Resource):
             return {"result": "success"}
         else:
             return {"result": "failed"}
-        
+
 @member_namespace.route('/delete_clan', methods=['DELETE'])
 class DeleteClan(Resource):
+    @jwt_required()
     @member_namespace.expect(member_namespace.model("클랜 삭제", {"clan_id": fields.Integer(description="삭제할 클랜 id", example=2)}))
     def delete(self):
         clan_id = request.json['clan_id']
@@ -127,15 +153,17 @@ class DeleteClan(Resource):
         
 @member_namespace.route('/add_clanmember', methods=['POST'])
 class AddClanMember(Resource):
+    @jwt_required()
     @member_namespace.expect(member_namespace.model("클랜원 추가", {"nickname": fields.String(description="클랜원 닉네임,배틀태그", example="헥토파스칼킥#1234"), "clan_id": fields.Integer(description="소속 클랜 id", example=2)}))
     def post(self):
         clan_id = request.json['clan_id']
         nickname = request.json['nickname']
         member_controller.add_clan_member(clan_id=clan_id, nickname=nickname)
         return {"result": "success"}
-    
+
 @member_namespace.route('/edit_clanmember', methods=['PATCH'])
 class EditClanMember(Resource):
+    @jwt_required()
     @member_namespace.expect(member_namespace.model("클랜원 닉네임 수정", {"member_id": fields.Integer(description="클랜원 고유 id", example=1), "nickname": fields.String(description="닉네임", example="내취미는윈드밀#1234")}))
     def patch(self):
         member_id = request.json['member_id']
@@ -143,43 +171,48 @@ class EditClanMember(Resource):
         member_controller.edit_clan_member(member_id=member_id, nickname=nickname)
         return {"result": "success", "value": nickname}
 
+
 @member_namespace.route('/delete_clanmember', methods=['DELETE'])
 class DeleteClanMember(Resource):
+    @jwt_required()
     @member_namespace.expect(member_namespace.model("클랜원 삭제", {"member_id": fields.Integer(description="삭제 할 클랜원 고유 id", example=1)})) 
     def delete(self):
         member_id = request.json['member_id']
         member_controller.delete_clan_member(member_id=member_id)
         return {"result": "success"}
     
-
 @member_namespace.route('/add_blacklist', methods=['POST'])
 class AddBlackList(Resource):
+    @jwt_required()
     @member_namespace.expect(member_namespace.model("블랙리스트 추가", blacklist_info))
     def post(self):
         array = request.json['array']
         member_controller.add_blacklist(array=array)
         return {"result": "success", "value": array }
-    
+
 @member_namespace.route('/edit_blacklist', methods=['PATCH'])
 class EditBlackList(Resource):
+    @jwt_required()
     @member_namespace.expect(member_namespace.model("블랙리스트 수정", {"blacklist_id": fields.Integer(description="수정 할 블랙리스트 고유 id", example=1), "array":fields.Nested(blacklist_info_nested) }))
     def patch(self):
         blacklist_id = request.json['blacklist_id']
         array = request.json['array']
         member_controller.edit_blacklist(blacklist_id=blacklist_id, array=array)
         return {"result": "success", "value":array}
-    
+
+
 @member_namespace.route('/delete_blacklist', methods=['DELETE'])
 class DeleteBlackList(Resource):
+    @jwt_required()
     @member_namespace.expect(member_namespace.model("블랙리스트 삭제", {"blacklist_id": fields.Integer(description="삭제 할 블랙리스트 고유 id", example=1)}))
     def delete(self):
         blacklist_id = request.json['blacklist_id']
         member_controller.delete_blacklist(blacklist_id=blacklist_id)
         return {"result": "success", "value": blacklist_id}
-    
 
 @member_namespace.route('/aaatest', methods=['POST'])
 class test(Resource):
+    @jwt_required()
     @member_namespace.expect(member_namespace.model("블랙리스트 삭제", {"blacklist_id": fields.Integer(description="삭제 할 블랙리스트 고유 id", example=1)}))
     def post(self):
        return member_controller.retrieve_clan_id("(주)황버섯")

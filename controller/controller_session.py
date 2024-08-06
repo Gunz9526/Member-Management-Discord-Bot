@@ -30,10 +30,8 @@ class SessionController():
         result = db.session.execute(db.select(Session).filter(Session.session_id==session_id, Session.session_name==session_name, Session.tokens==tokens, Session.expired==0).order_by(Session.created_at.desc())).scalar()
         return result
 
-    def check_falsified_session(self, session_id, session_name, tokens):
+    def cross_check_session_token(self, session_id, session_name, tokens):
         result = db.session.execute(db.select(Session).filter(Session.session_id==session_id, Session.session_name==session_name, Session.tokens==tokens).order_by(Session.created_at.desc())).scalar()
-        if result is None:
-            return None
         return result
     
     def destory_session(self, session_name):
@@ -41,7 +39,7 @@ class SessionController():
         result.expired = 1
         # db.session.delete(result)
         db.session.commit()
-        return True        
+        return True
 
     def verify_permission(self):
         pass
