@@ -47,27 +47,22 @@ session_controller = SessionController()
 @member_namespace.route('/all_clan', methods=['POST'])
 class RetrieveAllClan(Resource):
     @jwt_required()
-    @member_namespace.expect(member_namespace.model("세션조회", {"session_name": fields.String(description="세션 name", example='dfsfdsfsdf')}))
+    @member_namespace.expect(member_namespace.model("세션조회", {"session_id": fields.Integer(description='세션 ID', example=1),"session_name": fields.String(description="세션 name", example='dfsfdsfsdf'), "tokens": fields.String(description="토큰", example="dsfsdfdsfsdf")}))
     def post(self):
         result = {}
         session_id = request.json['session_id']
         session_name = request.json['session_name']
-        
-
-        # 요청 헤더에서 JWT 토큰 텍스트 추출
-        auth_header = request.headers.get('Authorization', None)
-        if auth_header and auth_header.startswith('Bearer '):
-            tokens = auth_header.split(' ')[1]
-        else:
-            tokens = None
+        tokens = request.json['tokens']
 
         valid_check = session_controller.cross_check_session_token(session_id=session_id, session_name=session_name, tokens=tokens)
         if valid_check is None:
             return {"result": "Unauthorized"}
         clan_list = member_controller.retrieve_all_clan()
-        for i in range(len(clan_list)):
+        result['result'] = 'success'
+        result['clan_list'] = []
+        for i in range(len(clan_list)):     
             updated_time = str(datetime.datetime.fromtimestamp(int(clan_list[i].updated_at)))
-            result[i] = {"clan_id": clan_list[i].clan_id, "clan_name": clan_list[i].clanname, "clan_created_at": updated_time}
+            result['clan_list'].append([clan_list[i].clan_id, clan_list[i].clanname, updated_time])
         
         # result = get_jwt()
         return result
@@ -76,9 +71,16 @@ class RetrieveAllClan(Resource):
 @member_namespace.route('/all_clanmember', methods=['POST'])
 class RetrieveClanMember(Resource):
     @jwt_required()
-    @member_namespace.expect(member_namespace.model("클랜 별 인원 나열", {"clan_id": fields.Integer(description="조회 할 클랜 id", example=2)}))
+    @member_namespace.expect(member_namespace.model("클랜 별 인원 나열", {"clan_id": fields.Integer(description="조회 할 클랜 id", example=2),"session_id": fields.Integer(description='세션 ID', example=1),"session_name": fields.String(description="세션 name", example='dfsfdsfsdf'), "tokens": fields.String(description="토큰", example="dsfsdfdsfsdf")}))
     def post(self):
         result = {}
+        session_id = request.json['session_id']
+        session_name = request.json['session_name']
+        tokens = request.json['tokens']
+
+        valid_check = session_controller.cross_check_session_token(session_id=session_id, session_name=session_name, tokens=tokens)
+        if valid_check is None:
+            return {"result": "Unauthorized"}
         clan_id = request.json['clan_id']
         member_list = member_controller.listing_clan_member(clan_id=clan_id)
         for i in range(len(member_list)):

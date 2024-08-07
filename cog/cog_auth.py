@@ -26,7 +26,7 @@ class CogAuth(commands.Cog):
             session_object = SessionController()
             tokens = session_object.create_token(discord_nickname=ctx.author.display_name, discord_id=ctx.author.name, discord_unique_id=ctx.author.id)
             sessions = session_object.create_session(discord_nickname=ctx.author.display_name, discord_id=ctx.author.name, discord_unique_id=ctx.author.id, access_token=tokens['access_token'])
-            embed = discord.Embed(title='링크', description=link_url+'/session/'+sessions['session_name'])
+            embed = discord.Embed(title='링크', description=link_url+'/#/session/'+sessions['session_name'])
             embed.add_field(name='닉네임', value=(f'{member[0].nick}'), inline=True)
             embed.add_field(name='아이디', value=(f'{ctx.author.name}'), inline=True)
             embed.add_field(name='고유값', value=(f'{ctx.author.id}'), inline=True)

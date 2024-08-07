@@ -12,7 +12,7 @@ class SessionController():
         return {"access_token": access_token}
     
     def get_token(self, session_name):
-        result = db.session.execute(db.select(Session).filter(Session.session_name==session_name).order_by(Session.created_at.desc())).scalar()
+        result = db.session.execute(db.select(Session).filter(Session.session_name==session_name, Session.expired==0).order_by(Session.created_at.desc())).scalar()
         return result
 
     def verify_token(self, discord_nickname: str, discord_id: str, discord_unique_id: str):

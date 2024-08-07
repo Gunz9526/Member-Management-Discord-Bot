@@ -36,6 +36,20 @@ session_namespace = Namespace(
 #         session_object.destory_session(session_name==tokens.session_name)
 #         return {"token": tokens.tokens, "session_name": tokens.session_name, "result": "valid", "session_id": tokens.session_id}
 
+@session_namespace.route('/entrance_check', methods=['POST'])
+class Entrance_check (Resource):
+    @jwt_required()
+    @session_namespace.expect(session_namespace.model("세션 정보 확인", {"session_id": fields.Integer(description='세션 ID', example=1),"session_name": fields.String(description="세션 name", example='dfsfdsfsdf'), "tokens": fields.String(description="토큰", example="dsfsdfdsfsdf")}))
+    def post(self):
+        session_id = request.json['session_id']
+        session_name = request.json['session_name']
+        tokens = request.json['tokens']
+        session_object = SessionController()
+        validation_check = session_object.cross_check_session_token(session_id=session_id, session_name=session_name, tokens=tokens)
+        if validation_check is None:
+            return {"result": "Unauthorized"}
+        return {"result": "success"}
+
 @session_namespace.route('/get_token', methods=['POST'])
 class GetToken(Resource):
     @session_namespace.expect(session_namespace.model("토큰 및 세션 정보 반환", {'session_name': fields.String(description='세션 이름')}))
@@ -43,7 +57,9 @@ class GetToken(Resource):
         session_name = request.json['session_name']
         session_object = SessionController()
         tokens = session_object.get_token(session_name=session_name)
-        return {"token": tokens.tokens, "session_id": tokens.session_id, "session_name": tokens.session_name}
+        if tokens is None:
+            return {"result": "failed"}
+        return {"result": "success", "token": tokens.tokens, "session_id": tokens.session_id, "session_name": tokens.session_name}
 
 @session_namespace.route('/listing_session', methods=['GET'])
 class ListingSession(Resource):
@@ -58,11 +74,11 @@ class ListingSession(Resource):
     
 @session_namespace.route('/destroy_session', methods=['POST'])
 class DestroySession(Resource):
-    @session_namespace.expect(session_namespace.model("세션 만료", {"session_id": fields.Integer(description='세션아이디', example=1)}))
+    @session_namespace.expect(session_namespace.model("세션 만료", {"session_name": fields.Integer(description='세션이름', example='test')}))
     def post(self):
-        session_id = request.json['session_id']
+        session_name = request.json['session_name']
         session_object = SessionController()
-        session_object.destory_session(session_id)
+        session_object.destory_session(session_name)
         return {"result": "success"}
 
 
