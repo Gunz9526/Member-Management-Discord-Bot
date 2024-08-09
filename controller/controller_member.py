@@ -5,6 +5,7 @@ from model.model_member import Clan, ClanMember, BlackList
 class MemberController:
 
     # 세션 검사 프로세스 추후 추가
+    # 로그 프로세스
 
     def retrieve_all_clan(self):
         result = db.session.execute(db.select(Clan)).scalars().fetchall()
@@ -33,17 +34,6 @@ class MemberController:
     def listing_blacklist(self):
         result = db.session.execute(db.select(BlackList).filter_by(visible=1)).scalars().fetchall()
         return result
-    
-    def add_clan(self, clan_name):        
-        result = Clan(clanname=clan_name)
-        db.session.add(result)
-        db.session.commit()
-
-    def edit_clan(self, clan_id, edit_clan_name):
-        result = db.session.execute(db.select(Clan).filter_by(clan_id=clan_id)).scalar_one()
-        result.clanname = edit_clan_name
-        db.session.commit()
-        return True
 
     def delete_clan(self, clan_id):
         result = db.session.execute(db.select(Clan).filter_by(clan_id=clan_id)).scalar_one()

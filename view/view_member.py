@@ -92,7 +92,7 @@ class RetrieveClanMember(Resource):
 @member_namespace.route('/all_blacklist', methods=['GET'])
 class RetrieveBlackList(Resource):
     @jwt_required()
-    def get(self):        
+    def get(self):
         model_list = ["blacklist_id", "nickname", "age", "gender", "discord_name1", "discord_name2", "extra_information", "player_rank", "reason1", "reason2", "reason3", "description", "ban_date", "sub_account", "clan_id", "created_at"]
         result = {}
         blacklist = member_controller.listing_blacklist()

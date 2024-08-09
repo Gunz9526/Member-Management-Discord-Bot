@@ -41,9 +41,6 @@ class SessionController():
         db.session.commit()
         return True
 
-    def verify_permission(self):
-        pass
-
     def listing_session(self):
         result = db.session.execute(db.select(Session).order_by(Session.created_at.desc())).scalars().all()
         return result
